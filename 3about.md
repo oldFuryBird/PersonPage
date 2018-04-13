@@ -9,4 +9,3 @@ permalink: /about/
   * web后台开发,php开发
   * 现居深圳
   * Email:ccwc@163.com
-  * 已婚

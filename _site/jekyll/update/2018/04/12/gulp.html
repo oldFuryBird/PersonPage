@@ -6,12 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>标签</title>
-  <meta name="description" content="php 野路子出身 终生学习 web开发 python
-">
+  <title>Welcome to Jekyll!</title>
+  <meta name="description" content="使用gulp4.0坑  gulp-util is deprecated 弃用  gulp-cli需要使用4.0 gulp  task需要done()或文档的返回方式,否则    [16:20:22] The following tasks did not complete: default, webpack   ...">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/tags/">
+  <link rel="canonical" href="http://yourdomain.com/jekyll/update/2018/04/12/gulp.html">
   <link rel="alternate" type="application/rss+xml" title="我的博客" href="http://yourdomain.com/feed.xml">
 </head>
 
@@ -63,49 +62,24 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <article class="post">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title">标签</h1>
+    <h1 class="post-title" itemprop="name headline">Welcome to Jekyll!</h1>
+    <p class="post-meta"><time datetime="2018-04-12T20:59:58+08:00" itemprop="datePublished">Apr 12, 2018</time></p>
   </header>
 
-  <div class="post-content">
-    
-<section class="blog-tags">
-  <h1>Tags in Blog</h1>
-  <ul class="tags">
-<!--  cycles through tag list and creates header row of all tags used in site with accompanying per-tag counts...-->
-  
-    
-    <li><a href="#%E5%89%8D%E7%AB%AF%E5%B7%A5%E5%85%B7" class="tag">前端工具 <span>(1)</span></a></li>
-  
-    
-    <li><a href="#%E6%96%B9%E6%B3%95" class="tag">方法 <span>(1)</span></a></li>
-  
-  </ul>
-<!--cycles through tag list and creates subheader for each tag name...-->
-  
-    
-  <h2 id="%E5%89%8D%E7%AB%AF%E5%B7%A5%E5%85%B7">前端工具</h2>
-<!--  lists all posts corresponding to specific tag...-->
-    
-    <div class="tag-list">
-        <span><a href="/js/2018/04/13/gulp.html">gulp排错</a></span>
-        <small><span>| 13 Apr 2018</span></small>
-    </div>
-    
-  
-    
-  <h2 id="%E6%96%B9%E6%B3%95">方法</h2>
-<!--  lists all posts corresponding to specific tag...-->
-    
-    <div class="tag-list">
-        <span><a href="/life/2018/04/12/first-article.html">开篇</a></span>
-        <small><span>| 12 Apr 2018</span></small>
-    </div>
-    
-  
-</section>
+  <div class="post-content" itemprop="articleBody">
+    <h2 id="使用gulp40坑">使用gulp4.0坑</h2>
+<ol>
+  <li>gulp-util is deprecated 弃用</li>
+  <li>gulp-cli需要使用4.0 gulp</li>
+  <li>task需要done()或文档的返回方式,否则
+    [16:20:22] The following tasks did not complete: default, webpack
+    [16:20:22] Did you forget to signal async completion?</li>
+  <li>task方法有变化,[task1,task2] 废弃,gulp.series(task1,task2,[callback],gulp.parallel(task1,task2,[callback]) 排队执行和异步(同时)执行</li>
+  <li>es6解构前面一定要有分号 ;</li>
+</ol>
 
   </div>
 
