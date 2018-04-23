@@ -6,9 +6,192 @@
 </description>
     <link>http://yourdomain.com/</link>
     <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 13 Apr 2018 23:11:20 +0800</pubDate>
-    <lastBuildDate>Fri, 13 Apr 2018 23:11:20 +0800</lastBuildDate>
+    <pubDate>Mon, 23 Apr 2018 16:55:23 +0800</pubDate>
+    <lastBuildDate>Mon, 23 Apr 2018 16:55:23 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>关于数组排序的讨论</title>
+        <description>&lt;h1 id=&quot;数组的排序&quot;&gt;数组的排序&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;问题: 如何对一个二维数组进行排序?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;实现通过二维的一个字段进行排序&lt;/li&gt;
+  &lt;li&gt;实现像sql一样排序,order by o1,o2,o3….,依次用o1进行排序,如果排序完成之后,再按o2的排序&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;php文档介绍-php的排序是基于快速排序实现这里只讨论php的函数以及包的应用&quot;&gt;php文档介绍 php的排序是基于快速排序实现,这里只讨论php的函数以及包的应用&lt;/h3&gt;
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  # 要排序的数组
+  $arr = [
+      [&#39;id&#39;=&amp;gt;2,&#39;name&#39;=&amp;gt;&#39;e&#39;,&#39;age&#39;=&amp;gt;17],
+      [&#39;id&#39;=&amp;gt;4,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;15],
+      [&#39;id&#39;=&amp;gt;3,&#39;name&#39;=&amp;gt;&#39;b&#39;,&#39;age&#39;=&amp;gt;30],
+      [&#39;id&#39;=&amp;gt;6,&#39;name&#39;=&amp;gt;&#39;f&#39;,&#39;age&#39;=&amp;gt;18],
+      [&#39;id&#39;=&amp;gt;8,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;18],
+  ];
+  # 结果
+  # 按id 升序排后的结果
+  $arr_sort_by_id = [
+    [&#39;id&#39;=&amp;gt;2,&#39;name&#39;=&amp;gt;&#39;e&#39;,&#39;age&#39;=&amp;gt;17],
+    [&#39;id&#39;=&amp;gt;3,&#39;name&#39;=&amp;gt;&#39;b&#39;,&#39;age&#39;=&amp;gt;30],
+    [&#39;id&#39;=&amp;gt;4,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;15],
+    [&#39;id&#39;=&amp;gt;6,&#39;name&#39;=&amp;gt;&#39;f&#39;,&#39;age&#39;=&amp;gt;18],
+    [&#39;id&#39;=&amp;gt;8,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;18],
+  ];
+  # 按 age 升序排后的结果
+  $arr_sort_by_age = [
+    [&#39;id&#39;=&amp;gt;4,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;15],
+    [&#39;id&#39;=&amp;gt;2,&#39;name&#39;=&amp;gt;&#39;e&#39;,&#39;age&#39;=&amp;gt;17],
+    [&#39;id&#39;=&amp;gt;6,&#39;name&#39;=&amp;gt;&#39;f&#39;,&#39;age&#39;=&amp;gt;18],
+    [&#39;id&#39;=&amp;gt;8,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;18],
+    [&#39;id&#39;=&amp;gt;3,&#39;name&#39;=&amp;gt;&#39;b&#39;,&#39;age&#39;=&amp;gt;30],
+  ];
+  # 先按age排 然后再根据id 降序 把排age中重复的
+  $arr_sort_by_age_and_id = [
+    [&#39;id&#39;=&amp;gt;4,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;15],
+    [&#39;id&#39;=&amp;gt;2,&#39;name&#39;=&amp;gt;&#39;e&#39;,&#39;age&#39;=&amp;gt;17],
+    [&#39;id&#39;=&amp;gt;8,&#39;name&#39;=&amp;gt;&#39;a&#39;,&#39;age&#39;=&amp;gt;18],
+    [&#39;id&#39;=&amp;gt;6,&#39;name&#39;=&amp;gt;&#39;f&#39;,&#39;age&#39;=&amp;gt;18],
+    [&#39;id&#39;=&amp;gt;3,&#39;name&#39;=&amp;gt;&#39;b&#39;,&#39;age&#39;=&amp;gt;30],
+  ];
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2 id=&quot;php数组排序的方法&quot;&gt;php数组排序的方法&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;array_multisort 排序多个数组,功能强大&lt;/li&gt;
+  &lt;li&gt;usort 按用户自定义的函数排序&lt;/li&gt;
+  &lt;li&gt;uksort 按用户自定义函数比较键名排序&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;usort-自定义函数&quot;&gt;usort 自定义函数&lt;/h3&gt;
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    function orderBy( $key,$order = SORT_ASC ) {
+      return function ( $a, $b ) use( $key, $order ){
+          if($order == SORT_ASC)  return $a[$key]&amp;gt;$b[$key];
+          if($order == SORT_DESC) return $a[$key]&lt;span class=&quot;err&quot;&gt;&amp;lt;&lt;/span&gt;$b[$key];
+      };
+    }
+
+    $test_id  = $arr; //数组不是对象,数组是按值传递 与js不同
+    $test_age = $arr;
+    usort($test_id, orderBy(&#39;id&#39;));
+    usort($test_age, orderBy(&#39;age&#39;));
+    var_dump($test_id === $arr); //false
+    var_dump($test_id === $arr_sort_by_id); // true
+    var_dump($test_age === $arr_sort_by_age); // true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;usort-很好的解决了-order-by-1个字段的排序但如果面对多个字段将变得复杂&quot;&gt;usort 很好的解决了 order by 1个字段的排序,但如果面对多个字段将变得复杂&lt;/h4&gt;
+&lt;ol&gt;
+  &lt;li&gt;查找age的重复项数组&lt;/li&gt;
+  &lt;li&gt;将重复的数组提取出来 保留原索引键,并且按id逆序排序&lt;/li&gt;
+  &lt;li&gt;如果每一个字段都需要指定正序,倒序或者字符串的排序规则等,那么就会更加增加复杂度&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;function orderByKeys(...$key){
+   foreach($key as $i=&amp;gt;$item){
+    return function($a, $b) use($key, $i) {
+      if($a[$key[$i]]&amp;gt;$b[$key[$i]]){
+        return true;
+      }
+      if($a[$key[$i]] == $b[$key[$i]]) {
+        if(isset($key[$i+1])){
+          return $a[$key[$i+1]] &lt;span class=&quot;err&quot;&gt;&amp;lt;&lt;/span&gt; $b[$key[$i+1]];
+        }
+      }
+    };
+  }
+}
+$test_order_by_keys = $arr;
+usort($test_order_by_keys, orderByKeys(&#39;age&#39;, &#39;id&#39;));
+var_dump($test_order_by_keys === $arr_sort_by_age_and_id);//true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;内置函数-array_multisort-解决方案更加强大和清晰&quot;&gt;内置函数 array_multisort 解决方案,更加强大和清晰&lt;/h3&gt;
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  $arr_multisort = $arr;
+  $sortedAge = array_column($arr_multisort, &#39;age&#39;);
+  $sortedId  = array_column($arr_multisort, &#39;id&#39;);
+  array_multisort(
+    $sortedAge, SORT_ASC,
+    $sortedId, SORT_DESC,
+    // .... 更多字段的order by
+    $arr_multisort);
+  var_dump($arr_multisort === $arr_sort_by_age_and_id);//true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;illuminatesupportcollection包-collection-集合对象的方法&quot;&gt;Illuminate\Support\Collection包 Collection 集合对象的方法&lt;/h2&gt;
+&lt;h3 id=&quot;简介&quot;&gt;简介&lt;/h3&gt;
+&lt;p&gt;laravel框架中内置了Collection类,将Model调用的数据打包成一个对象,对象中集成了很多常用的处理数据的方法,如 every  集合对象真理测试,filter过滤,where查找,sort,group,json,contain,has等方法.&lt;/p&gt;
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    $user= User::where($conditions)-&amp;gt;get();// 从数据库取出打包成Collection 对象
+    // Eloquent where之后在Collection类中还可以再一次处理
+    $result = $user-&amp;gt;where($conditions_else)-&amp;gt;when($when)-&amp;gt;toJson();
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3 id=&quot;laravel是由一个一个包组合成的框架-很多包依赖较低可以在工程中直接引用&quot;&gt;laravel是由一个一个包组合成的框架, 很多包依赖较低,可以在工程中直接引用&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  composer require illuminate/support
+  # support 包含了很多可复用的方法  Collection是其中之一 还有字符串和数组方法
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h4 id=&quot;使用方法&quot;&gt;使用方法&lt;/h4&gt;
+&lt;ol&gt;
+  &lt;li&gt;使用collection类
+    &lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  require &#39;vendor/autoload.php&#39;;
+  use Illuminate\Support\Collection;
+  $collect = new Collection($arr); // 获得一个collection对象
+  $test_by_id = $collect-&amp;gt;sortBy(&#39;id&#39;)-&amp;gt;values()-&amp;gt;all();
+  // sortBy 底层采用asort排序,默认不会改变索引,values() 重置索引 ,all()取出数组
+  $test_by_age = $collect-&amp;gt;sortBy(&#39;age&#39;)-&amp;gt;values()-&amp;gt;all();
+  var_dump($test_by_id===$arr_sort_by_id);
+  var_dump($test_by_age===$arr_sort_by_age);
+  #collection 没有支持orderBy 多个字段
+&lt;/code&gt;&lt;/pre&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;使用helpers.php里面的函数方法 (包含68个常用方法)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  # package.json
+  ...
+    &quot;autoload&quot;:{
+      &quot;files&quot;:&quot;vendor/illuminate/support/helpers.php&quot;
+    }
+  ...
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;composer dump-auto &lt;/code&gt; //重新生成autoload.php 文件&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;require &#39;vendor/autoload.php&#39;;
+//$test_by_id = array_sort($arr,&#39;id&#39;);//array_sort 内部调用 collection 方法但是不改变索引
+//$test_by_id = array_sort($arr,&#39;age&#39;);
+$collect = collect($arr);
+//...
+$test_by_id = $collect-&amp;gt;sortBy(&#39;id&#39;)-&amp;gt;values()-&amp;gt;all();
+$test_by_age = $collect-&amp;gt;sortBy(&#39;age&#39;)-&amp;gt;values()-&amp;gt;all();
+var_dump($test_by_id === $arr_sort_by_id);
+var_dump($test_by_age === $arr_sort_by_age);
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;可以在SQL中直接完成排序再取出数据使用,如果必要的话.&lt;/li&gt;
+  &lt;li&gt;框架使用的是uasort/ usort /asort 实现排序
+    &lt;ul&gt;
+      &lt;li&gt;如果没有使用框架,原生的uasort可以满足order by 1个字段,order by 多个字段需要测试检验&lt;/li&gt;
+      &lt;li&gt;使用库或者框架,建议使用 sortBy,名称具有语义,laravel获取的对象自带该方法,且经过了测试&lt;/li&gt;
+      &lt;li&gt;多个order 排序建议使用,array_multisort来进行,灵活而且强大,或者数据库排序&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Mon, 23 Apr 2018 12:10:58 +0800</pubDate>
+        <link>http://yourdomain.com/php/2018/04/23/array_sort.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/php/2018/04/23/array_sort.html</guid>
+        
+        <category>工具</category>
+        
+        
+        <category>php</category>
+        
+      </item>
     
       <item>
         <title>gulp排错</title>
