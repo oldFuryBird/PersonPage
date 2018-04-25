@@ -10,8 +10,8 @@
   <meta name="description" content="数组的排序问题: 如何对一个二维数组进行排序?">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://yourdomain.com/php/2018/04/23/array_sort.html">
-  <link rel="alternate" type="application/rss+xml" title="我的博客" href="http://yourdomain.com/feed.xml">
+  <link rel="canonical" href="http://localhost:4000/php/2018/04/23/array_sort.html">
+  <link rel="alternate" type="application/rss+xml" title="我的博客" href="http://localhost:4000/feed.xml">
 </head>
 
 
@@ -79,41 +79,41 @@
 </ul>
 
 <h3 id="php文档介绍-php的排序是基于快速排序实现这里只讨论php的函数以及包的应用">php文档介绍 php的排序是基于快速排序实现,这里只讨论php的函数以及包的应用</h3>
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>  # 要排序的数组
-  $arr = [
-      ['id'=&gt;2,'name'=&gt;'e','age'=&gt;17],
-      ['id'=&gt;4,'name'=&gt;'a','age'=&gt;15],
-      ['id'=&gt;3,'name'=&gt;'b','age'=&gt;30],
-      ['id'=&gt;6,'name'=&gt;'f','age'=&gt;18],
-      ['id'=&gt;8,'name'=&gt;'a','age'=&gt;18],
-  ];
-  # 结果
-  # 按id 升序排后的结果
-  $arr_sort_by_id = [
-    ['id'=&gt;2,'name'=&gt;'e','age'=&gt;17],
-    ['id'=&gt;3,'name'=&gt;'b','age'=&gt;30],
-    ['id'=&gt;4,'name'=&gt;'a','age'=&gt;15],
-    ['id'=&gt;6,'name'=&gt;'f','age'=&gt;18],
-    ['id'=&gt;8,'name'=&gt;'a','age'=&gt;18],
-  ];
-  # 按 age 升序排后的结果
-  $arr_sort_by_age = [
-    ['id'=&gt;4,'name'=&gt;'a','age'=&gt;15],
-    ['id'=&gt;2,'name'=&gt;'e','age'=&gt;17],
-    ['id'=&gt;6,'name'=&gt;'f','age'=&gt;18],
-    ['id'=&gt;8,'name'=&gt;'a','age'=&gt;18],
-    ['id'=&gt;3,'name'=&gt;'b','age'=&gt;30],
-  ];
-  # 先按age排 然后再根据id 降序 把排age中重复的
-  $arr_sort_by_age_and_id = [
-    ['id'=&gt;4,'name'=&gt;'a','age'=&gt;15],
-    ['id'=&gt;2,'name'=&gt;'e','age'=&gt;17],
-    ['id'=&gt;8,'name'=&gt;'a','age'=&gt;18],
-    ['id'=&gt;6,'name'=&gt;'f','age'=&gt;18],
-    ['id'=&gt;3,'name'=&gt;'b','age'=&gt;30],
-  ];
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1"># 要排序的数组</span>
+  <span class="nv">$arr</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">2</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'e'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">17</span><span class="p">],</span>
+      <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">4</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">15</span><span class="p">],</span>
+      <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">3</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">30</span><span class="p">],</span>
+      <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">6</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'f'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+      <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">8</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+  <span class="p">];</span>
+  <span class="c1"># 结果</span>
+  <span class="c1"># 按id 升序排后的结果</span>
+  <span class="nv">$arr_sort_by_id</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">2</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'e'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">17</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">3</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">30</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">4</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">15</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">6</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'f'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">8</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+  <span class="p">];</span>
+  <span class="c1"># 按 age 升序排后的结果</span>
+  <span class="nv">$arr_sort_by_age</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">4</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">15</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">2</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'e'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">17</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">6</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'f'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">8</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">3</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">30</span><span class="p">],</span>
+  <span class="p">];</span>
+  <span class="c1"># 先按age排 然后再根据id 降序 把排age中重复的</span>
+  <span class="nv">$arr_sort_by_age_and_id</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">4</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">15</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">2</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'e'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">17</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">8</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'a'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">6</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'f'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">18</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">'id'</span><span class="o">=&gt;</span><span class="mi">3</span><span class="p">,</span><span class="s1">'name'</span><span class="o">=&gt;</span><span class="s1">'b'</span><span class="p">,</span><span class="s1">'age'</span><span class="o">=&gt;</span><span class="mi">30</span><span class="p">],</span>
+  <span class="p">];</span>
 
-</code></pre></div>
+</code></pre></div></div>
 <h2 id="php数组排序的方法">php数组排序的方法</h2>
 <ul>
   <li>array_multisort 排序多个数组,功能强大</li>
@@ -122,21 +122,21 @@
 </ul>
 
 <h3 id="usort-自定义函数">usort 自定义函数</h3>
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>    function orderBy( $key,$order = SORT_ASC ) {
-      return function ( $a, $b ) use( $key, $order ){
-          if($order == SORT_ASC)  return $a[$key]&gt;$b[$key];
-          if($order == SORT_DESC) return $a[$key]<span class="err">&lt;</span>$b[$key];
-      };
-    }
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">function</span> <span class="nf">orderBy</span><span class="p">(</span> <span class="nv">$key</span><span class="p">,</span><span class="nv">$order</span> <span class="o">=</span> <span class="nx">SORT_ASC</span> <span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">function</span> <span class="p">(</span> <span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span> <span class="p">)</span> <span class="k">use</span><span class="p">(</span> <span class="nv">$key</span><span class="p">,</span> <span class="nv">$order</span> <span class="p">){</span>
+          <span class="k">if</span><span class="p">(</span><span class="nv">$order</span> <span class="o">==</span> <span class="nx">SORT_ASC</span><span class="p">)</span>  <span class="k">return</span> <span class="nv">$a</span><span class="p">[</span><span class="nv">$key</span><span class="p">]</span><span class="o">&gt;</span><span class="nv">$b</span><span class="p">[</span><span class="nv">$key</span><span class="p">];</span>
+          <span class="k">if</span><span class="p">(</span><span class="nv">$order</span> <span class="o">==</span> <span class="nx">SORT_DESC</span><span class="p">)</span> <span class="k">return</span> <span class="nv">$a</span><span class="p">[</span><span class="nv">$key</span><span class="p">]</span><span class="o">&lt;</span><span class="nv">$b</span><span class="p">[</span><span class="nv">$key</span><span class="p">];</span>
+      <span class="p">};</span>
+    <span class="p">}</span>
 
-    $test_id  = $arr; //数组不是对象,数组是按值传递 与js不同
-    $test_age = $arr;
-    usort($test_id, orderBy('id'));
-    usort($test_age, orderBy('age'));
-    var_dump($test_id === $arr); //false
-    var_dump($test_id === $arr_sort_by_id); // true
-    var_dump($test_age === $arr_sort_by_age); // true
-</code></pre></div>
+    <span class="nv">$test_id</span>  <span class="o">=</span> <span class="nv">$arr</span><span class="p">;</span> <span class="c1">//数组不是对象,数组是按值传递 与js不同</span>
+    <span class="nv">$test_age</span> <span class="o">=</span> <span class="nv">$arr</span><span class="p">;</span>
+    <span class="nb">usort</span><span class="p">(</span><span class="nv">$test_id</span><span class="p">,</span> <span class="nx">orderBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">));</span>
+    <span class="nb">usort</span><span class="p">(</span><span class="nv">$test_age</span><span class="p">,</span> <span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">));</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_id</span> <span class="o">===</span> <span class="nv">$arr</span><span class="p">);</span> <span class="c1">//false</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_id</span> <span class="o">===</span> <span class="nv">$arr_sort_by_id</span><span class="p">);</span> <span class="c1">// true</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_age</span> <span class="o">===</span> <span class="nv">$arr_sort_by_age</span><span class="p">);</span> <span class="c1">// true</span>
+</code></pre></div></div>
 
 <h4 id="usort-很好的解决了-order-by-1个字段的排序但如果面对多个字段将变得复杂">usort 很好的解决了 order by 1个字段的排序,但如果面对多个字段将变得复杂</h4>
 <ol>
@@ -145,88 +145,88 @@
   <li>如果每一个字段都需要指定正序,倒序或者字符串的排序规则等,那么就会更加增加复杂度</li>
 </ol>
 
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>function orderByKeys(...$key){
-   foreach($key as $i=&gt;$item){
-    return function($a, $b) use($key, $i) {
-      if($a[$key[$i]]&gt;$b[$key[$i]]){
-        return true;
-      }
-      if($a[$key[$i]] == $b[$key[$i]]) {
-        if(isset($key[$i+1])){
-          return $a[$key[$i+1]] <span class="err">&lt;</span> $b[$key[$i+1]];
-        }
-      }
-    };
-  }
-}
-$test_order_by_keys = $arr;
-usort($test_order_by_keys, orderByKeys('age', 'id'));
-var_dump($test_order_by_keys === $arr_sort_by_age_and_id);//true
-</code></pre></div>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="nf">orderByKeys</span><span class="p">(</span><span class="o">...</span><span class="nv">$key</span><span class="p">){</span>
+   <span class="k">foreach</span><span class="p">(</span><span class="nv">$key</span> <span class="k">as</span> <span class="nv">$i</span><span class="o">=&gt;</span><span class="nv">$item</span><span class="p">){</span>
+    <span class="k">return</span> <span class="k">function</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span> <span class="k">use</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="nv">$a</span><span class="p">[</span><span class="nv">$key</span><span class="p">[</span><span class="nv">$i</span><span class="p">]]</span><span class="o">&gt;</span><span class="nv">$b</span><span class="p">[</span><span class="nv">$key</span><span class="p">[</span><span class="nv">$i</span><span class="p">]]){</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="k">if</span><span class="p">(</span><span class="nv">$a</span><span class="p">[</span><span class="nv">$key</span><span class="p">[</span><span class="nv">$i</span><span class="p">]]</span> <span class="o">==</span> <span class="nv">$b</span><span class="p">[</span><span class="nv">$key</span><span class="p">[</span><span class="nv">$i</span><span class="p">]])</span> <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$key</span><span class="p">[</span><span class="nv">$i</span><span class="o">+</span><span class="mi">1</span><span class="p">])){</span>
+          <span class="k">return</span> <span class="nv">$a</span><span class="p">[</span><span class="nv">$key</span><span class="p">[</span><span class="nv">$i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span> <span class="o">&lt;</span> <span class="nv">$b</span><span class="p">[</span><span class="nv">$key</span><span class="p">[</span><span class="nv">$i</span><span class="o">+</span><span class="mi">1</span><span class="p">]];</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="nv">$test_order_by_keys</span> <span class="o">=</span> <span class="nv">$arr</span><span class="p">;</span>
+<span class="nb">usort</span><span class="p">(</span><span class="nv">$test_order_by_keys</span><span class="p">,</span> <span class="nx">orderByKeys</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'id'</span><span class="p">));</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_order_by_keys</span> <span class="o">===</span> <span class="nv">$arr_sort_by_age_and_id</span><span class="p">);</span><span class="c1">//true</span>
+</code></pre></div></div>
 
 <h3 id="内置函数-array_multisort-解决方案更加强大和清晰">内置函数 array_multisort 解决方案,更加强大和清晰</h3>
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>  $arr_multisort = $arr;
-  $sortedAge = array_column($arr_multisort, 'age');
-  $sortedId  = array_column($arr_multisort, 'id');
-  array_multisort(
-    $sortedAge, SORT_ASC,
-    $sortedId, SORT_DESC,
-    // .... 更多字段的order by
-    $arr_multisort);
-  var_dump($arr_multisort === $arr_sort_by_age_and_id);//true
-</code></pre></div>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nv">$arr_multisort</span> <span class="o">=</span> <span class="nv">$arr</span><span class="p">;</span>
+  <span class="nv">$sortedAge</span> <span class="o">=</span> <span class="nb">array_column</span><span class="p">(</span><span class="nv">$arr_multisort</span><span class="p">,</span> <span class="s1">'age'</span><span class="p">);</span>
+  <span class="nv">$sortedId</span>  <span class="o">=</span> <span class="nb">array_column</span><span class="p">(</span><span class="nv">$arr_multisort</span><span class="p">,</span> <span class="s1">'id'</span><span class="p">);</span>
+  <span class="nb">array_multisort</span><span class="p">(</span>
+    <span class="nv">$sortedAge</span><span class="p">,</span> <span class="nx">SORT_ASC</span><span class="p">,</span>
+    <span class="nv">$sortedId</span><span class="p">,</span> <span class="nx">SORT_DESC</span><span class="p">,</span>
+    <span class="c1">// .... 更多字段的order by</span>
+    <span class="nv">$arr_multisort</span><span class="p">);</span>
+  <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$arr_multisort</span> <span class="o">===</span> <span class="nv">$arr_sort_by_age_and_id</span><span class="p">);</span><span class="c1">//true</span>
+</code></pre></div></div>
 
 <h2 id="illuminatesupportcollection包-collection-集合对象的方法">Illuminate\Support\Collection包 Collection 集合对象的方法</h2>
 <h3 id="简介">简介</h3>
 <p>laravel框架中内置了Collection类,将Model调用的数据打包成一个对象,对象中集成了很多常用的处理数据的方法,如 every  集合对象真理测试,filter过滤,where查找,sort,group,json,contain,has等方法.</p>
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>    $user= User::where($conditions)-&gt;get();// 从数据库取出打包成Collection 对象
-    // Eloquent where之后在Collection类中还可以再一次处理
-    $result = $user-&gt;where($conditions_else)-&gt;when($when)-&gt;toJson();
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nv">$user</span><span class="o">=</span> <span class="nx">User</span><span class="o">::</span><span class="na">where</span><span class="p">(</span><span class="nv">$conditions</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">();</span><span class="c1">// 从数据库取出打包成Collection 对象</span>
+    <span class="c1">// Eloquent where之后在Collection类中还可以再一次处理</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="nv">$conditions_else</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">when</span><span class="p">(</span><span class="nv">$when</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">toJson</span><span class="p">();</span>
 
-</code></pre></div>
+</code></pre></div></div>
 <h3 id="laravel是由一个一个包组合成的框架-很多包依赖较低可以在工程中直接引用">laravel是由一个一个包组合成的框架, 很多包依赖较低,可以在工程中直接引用</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>  composer require illuminate/support
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  composer require illuminate/support
   # support 包含了很多可复用的方法  Collection是其中之一 还有字符串和数组方法
-</code></pre></div>
+</code></pre></div></div>
 <h4 id="使用方法">使用方法</h4>
 <ol>
   <li>使用collection类
-    <div class="language-php highlighter-rouge"><pre class="highlight"><code>  require 'vendor/autoload.php';
-  use Illuminate\Support\Collection;
-  $collect = new Collection($arr); // 获得一个collection对象
-  $test_by_id = $collect-&gt;sortBy('id')-&gt;values()-&gt;all();
-  // sortBy 底层采用asort排序,默认不会改变索引,values() 重置索引 ,all()取出数组
-  $test_by_age = $collect-&gt;sortBy('age')-&gt;values()-&gt;all();
-  var_dump($test_by_id===$arr_sort_by_id);
-  var_dump($test_by_age===$arr_sort_by_age);
-  #collection 没有支持orderBy 多个字段
-</code></pre>    </div>
+    <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">require</span> <span class="s1">'vendor/autoload.php'</span><span class="p">;</span>
+  <span class="k">use</span> <span class="nx">Illuminate\Support\Collection</span><span class="p">;</span>
+  <span class="nv">$collect</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Collection</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span> <span class="c1">// 获得一个collection对象</span>
+  <span class="nv">$test_by_id</span> <span class="o">=</span> <span class="nv">$collect</span><span class="o">-&gt;</span><span class="na">sortBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">values</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">();</span>
+  <span class="c1">// sortBy 底层采用asort排序,默认不会改变索引,values() 重置索引 ,all()取出数组</span>
+  <span class="nv">$test_by_age</span> <span class="o">=</span> <span class="nv">$collect</span><span class="o">-&gt;</span><span class="na">sortBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">values</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">();</span>
+  <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_by_id</span><span class="o">===</span><span class="nv">$arr_sort_by_id</span><span class="p">);</span>
+  <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_by_age</span><span class="o">===</span><span class="nv">$arr_sort_by_age</span><span class="p">);</span>
+  <span class="c1">#collection 没有支持orderBy 多个字段</span>
+</code></pre></div>    </div>
   </li>
   <li>使用helpers.php里面的函数方法 (包含68个常用方法)</li>
 </ol>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  # package.json
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  # package.json
   ...
     "autoload":{
       "files":"vendor/illuminate/support/helpers.php"
     }
   ...
 
-</code></pre></div>
+</code></pre></div></div>
 
 <p><code class="highlighter-rouge">composer dump-auto </code> //重新生成autoload.php 文件</p>
 
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>require 'vendor/autoload.php';
-//$test_by_id = array_sort($arr,'id');//array_sort 内部调用 collection 方法但是不改变索引
-//$test_by_id = array_sort($arr,'age');
-$collect = collect($arr);
-//...
-$test_by_id = $collect-&gt;sortBy('id')-&gt;values()-&gt;all();
-$test_by_age = $collect-&gt;sortBy('age')-&gt;values()-&gt;all();
-var_dump($test_by_id === $arr_sort_by_id);
-var_dump($test_by_age === $arr_sort_by_age);
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">require</span> <span class="s1">'vendor/autoload.php'</span><span class="p">;</span>
+<span class="c1">//$test_by_id = array_sort($arr,'id');//array_sort 内部调用 collection 方法但是不改变索引</span>
+<span class="c1">//$test_by_id = array_sort($arr,'age');</span>
+<span class="nv">$collect</span> <span class="o">=</span> <span class="nx">collect</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span>
+<span class="c1">//...</span>
+<span class="nv">$test_by_id</span> <span class="o">=</span> <span class="nv">$collect</span><span class="o">-&gt;</span><span class="na">sortBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">values</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">();</span>
+<span class="nv">$test_by_age</span> <span class="o">=</span> <span class="nv">$collect</span><span class="o">-&gt;</span><span class="na">sortBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">values</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">all</span><span class="p">();</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_by_id</span> <span class="o">===</span> <span class="nv">$arr_sort_by_id</span><span class="p">);</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$test_by_age</span> <span class="o">===</span> <span class="nv">$arr_sort_by_age</span><span class="p">);</span>
 
-</code></pre></div>
+</code></pre></div></div>
 
 <h2 id="总结">总结</h2>
 <ul>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>无限级分类总结</title>
+  <meta name="description" content="无限级分类无限级别分类将数据保存在树结构中">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/php/2018/04/25/category.html">
+  <link rel="alternate" type="application/rss+xml" title="我的博客" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">我的博客</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/archive/">归档</a>
+          
+        
+          
+          <a class="page-link" href="/tags/">标签</a>
+          
+        
+          
+          <a class="page-link" href="/about/">关于我</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">无限级分类总结</h1>
+    <p class="post-meta"><time datetime="2018-04-25T18:10:58+08:00" itemprop="datePublished">Apr 25, 2018</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h2 id="无限级分类">无限级分类</h2>
+<p>无限级别分类将数据保存在树结构中</p>
+
+<h3 id="需求无限级分类通常用于以下场景">需求,无限级分类通常用于以下场景</h3>
+<ol>
+  <li>导航菜单,子菜单分类 (层级结构)</li>
+  <li>面包屑导航 /home/aa/bb/cc/dd  (查找祖先节点)</li>
+  <li>留言,跟帖,跟帖的跟帖 一层一层的跟帖 (查找子孙)</li>
+  <li>省/城市/镇/村/xx/xx 地点的层级   (祖先树)</li>
+  <li>其他需要层级关系的地方</li>
+</ol>
+
+<h3 id="基本结构">基本结构</h3>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">class</span> <span class="nc">node</span>
+    <span class="p">{</span>
+      <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
+      <span class="k">public</span> <span class="nv">$pid</span><span class="p">;</span>
+      <span class="k">public</span> <span class="nv">$content</span><span class="p">;</span>
+    <span class="p">}</span>
+
+</code></pre></div></div>
+<h3 id="功能">功能</h3>
+<p>功能 | api
+ —|—
+新增节点 | add
+批量增加(树状结构数组) |  build
+删除节点  | delete
+移动节点  | move/update
+查找子节点 | children
+查找祖先节点  | ancestor
+查找子孙节点 | descendant
+查找叶节点   | leaf
+查找兄弟,上一个兄弟,下一个兄弟  | brother,pre,next</p>
+
+<p>每个节点至少需要有一个父节点 pid,父节点对应父亲的id,这样形成树状关系</p>
+
+<h3 id="数组实现">数组实现</h3>
+<h4 id="递归">递归</h4>
+<p>主要是查找祖先树和查找子孙树,数组的插入和更新非常容易,主要是查找祖先和子孙</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 查找当前节点的所有祖先节点 从根开始</span>
+<span class="k">function</span> <span class="nf">ftree</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span><span class="nv">$id</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$ftree</span><span class="o">=</span> <span class="p">[];</span>
+  <span class="k">foreach</span><span class="p">(</span><span class="nv">$arr</span> <span class="k">as</span> <span class="nv">$item</span> <span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nv">$item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="o">===</span><span class="nv">$id</span><span class="p">){</span>
+      <span class="nx">ftree</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span><span class="nv">$item</span><span class="p">[</span><span class="s1">'pid'</span><span class="p">]);</span>
+      <span class="nv">$free</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$item</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nv">$free</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// 查找所有子节点 $lev 标识层级</span>
+<span class="k">function</span> <span class="nf">stree</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span><span class="nv">$lev</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">static</span> <span class="nv">$stree</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">foreach</span><span class="p">(</span><span class="nv">$arr</span> <span class="k">as</span> <span class="nv">$item</span> <span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nv">$item</span><span class="p">[</span><span class="s1">'pid'</span><span class="p">]</span><span class="o">===</span><span class="nv">$id</span><span class="p">){</span>
+      <span class="nv">$item</span><span class="p">[</span><span class="s1">'lev'</span><span class="p">]</span><span class="o">=</span><span class="nv">$lev</span><span class="p">;</span>
+      <span class="nv">$stree</span><span class="p">[]</span> <span class="o">=</span><span class="nv">$item</span><span class="p">;</span>
+      <span class="nx">stree</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span><span class="nv">$item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">],</span><span class="nv">$lev</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nv">$stree</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<h3 id="非递归实现">非递归实现</h3>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="nf">stree</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span><span class="nv">$id</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="nv">$stack</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="nv">$result</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="nv">$lev</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">foreach</span><span class="p">(</span><span class="nv">$arr</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">){</span> <span class="c1">//压人第一层子节点到栈</span>
+    <span class="k">if</span><span class="p">(</span><span class="nv">$item</span><span class="p">[</span><span class="s1">'pid'</span><span class="p">]</span><span class="o">===</span><span class="nv">$id</span><span class="p">){</span>
+      <span class="nv">$item</span><span class="p">[</span><span class="s1">'lev'</span><span class="p">]</span><span class="o">=</span><span class="nv">$lev</span><span class="p">;</span>
+      <span class="nb">array_push</span><span class="p">(</span><span class="nv">$stack</span><span class="p">,</span><span class="nv">$item</span><span class="p">);</span>
+      <span class="nv">$result</span><span class="p">[]</span><span class="o">=</span><span class="nv">$item</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">while</span><span class="p">(</span><span class="nv">$data</span><span class="o">=</span><span class="nb">array_pop</span><span class="p">(</span><span class="nv">$stack</span><span class="p">)){</span>
+      <span class="k">foreach</span><span class="p">(</span><span class="nv">$arr</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">){</span>
+        <span class="k">if</span><span class="p">(</span><span class="nv">$item</span><span class="p">[</span><span class="s1">'pid'</span><span class="p">]</span><span class="o">===</span><span class="nv">$data</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]){</span>
+          <span class="nv">$item</span><span class="p">[</span><span class="s1">'lev'</span><span class="p">]</span><span class="o">=</span><span class="nv">$lev</span><span class="o">++</span><span class="p">;</span>
+          <span class="nb">array_push</span><span class="p">(</span><span class="nv">$stack</span><span class="p">,</span><span class="nv">$item</span><span class="p">);</span><span class="c1">//如果找到的父节点=当前弹出元素,压入栈</span>
+          <span class="nv">$result</span><span class="p">[]</span><span class="o">=</span><span class="nv">$item</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">function</span> <span class="nf">ftree</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span><span class="nv">$id</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="nv">$stack</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="nv">$result</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="nv">$top</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="c1">//最顶层的祖先pid==0</span>
+  <span class="c1">//首先把自己压到栈</span>
+  <span class="k">foreach</span><span class="p">(</span><span class="nv">$arr</span> <span class="k">as</span> <span class="nv">$item</span> <span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nv">$item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span> <span class="o">===</span> <span class="nv">$id</span> <span class="p">){</span>
+        <span class="nb">array_push</span><span class="p">(</span><span class="nv">$stack</span><span class="p">,</span><span class="nv">$item</span><span class="p">);</span>  
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">while</span><span class="p">((</span><span class="nv">$data</span> <span class="o">=</span> <span class="nb">array_pop</span><span class="p">(</span><span class="nv">$stack</span><span class="p">)))</span> <span class="p">{</span>
+    <span class="k">foreach</span><span class="p">(</span><span class="nv">$arr</span> <span class="k">as</span> <span class="nv">$item</span> <span class="p">){</span>
+      <span class="k">if</span><span class="p">(</span><span class="nv">$item</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="o">===</span><span class="nv">$data</span><span class="p">[</span><span class="s1">'pid'</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">'pid'</span><span class="p">]</span><span class="o">!=</span><span class="nv">$top</span><span class="p">){</span> <span class="c1">//找到父亲</span>
+          <span class="nv">$result</span><span class="p">[]</span><span class="o">=</span><span class="nv">$item</span><span class="p">;</span>
+          <span class="nb">array_push</span><span class="p">(</span><span class="nv">$stack</span><span class="p">,</span><span class="nv">$item</span><span class="p">);</span><span class="c1">//把有节点的父亲压人栈</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<h3 id="问题递归和非递归的时间复杂度-至少是n的平方级别">问题,递归和非递归的时间复杂度 至少是n的平方级别</h3>
+<ol>
+  <li>递归方法 &gt; n<sup>2</sup> 略估</li>
+  <li>栈方法 n<sup>2</sup></li>
+</ol>
+
+<h3 id="并且每次读入数组也非常占用空间如果有100w条数据有无限级分类的需求那么将耗费很多资源">并且每次读入数组也非常占用空间,如果有100W条数据有无限级分类的需求,那么将耗费很多资源</h3>
+<h3 id="无限级分类一般对查找需求较大修改和删除更新的需求较少">无限级分类一般对查找需求较大,修改和删除,更新的需求较少</h3>
+
+<h2 id="树结构的无限级分类">树结构的无限级分类</h2>
+
+<h3 id="优点">优点</h3>
+<ol>
+  <li>可以通过数据库的select 查询获取子孙树,祖先树等</li>
+  <li>可以处理大量的数据,select 查找祖先,和子孙根据节点的left和right值查找</li>
+</ol>
+
+<h3 id="缺点">缺点</h3>
+<ol>
+  <li>插入和更新逻辑复杂</li>
+  <li>新增和修改需要改动大量数据,而且保存需要增加至少left,right字段,空间占用较大</li>
+</ol>
+
+<h4 id="规则">规则</h4>
+<ol>
+  <li>每个节点都有left,right值,left 为该节点的最后一个兄弟(left asc排序)的right+1,如果没有兄弟就是父节点的left+1</li>
+  <li>每个节点的right为最后一个孩子节点的right+1,如果没有孩子,那么就是自己节点的left+1</li>
+</ol>
+
+<h4 id="sql-查找节点node子孙树">sql 查找节点$node子孙树</h4>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">catetree</span> <span class="k">where</span> <span class="k">left</span> <span class="o">&gt;</span> <span class="err">$</span><span class="n">node</span><span class="p">[</span><span class="s1">'left'</span><span class="p">]</span> <span class="k">and</span>
+  <span class="k">right</span> <span class="o">&lt;</span> <span class="err">$</span><span class="n">node</span><span class="p">[</span><span class="s1">'right'</span><span class="p">];</span>
+  <span class="o">##</span> <span class="err">根据插入规则子孙的</span><span class="k">left</span><span class="err">肯定比</span> <span class="err">$</span><span class="n">node</span> <span class="err">的大</span><span class="p">,</span><span class="err">而子孙的</span><span class="k">right</span><span class="err">肯定小于$</span><span class="n">node</span>
+</code></pre></div></div>
+<h4 id="sql查找节点node的祖先树">sql查找节点$node的祖先树</h4>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">catetree</span> <span class="k">where</span> <span class="k">left</span><span class="o">&lt;</span><span class="err">$</span><span class="n">node</span><span class="p">[</span><span class="s1">'left'</span><span class="p">]</span> <span class="k">and</span> <span class="k">right</span> <span class="o">&gt;</span><span class="err">$</span><span class="n">node</span><span class="p">[</span><span class="s1">'right'</span><span class="p">];</span>
+
+  <span class="o">#</span><span class="k">order</span> <span class="k">by</span> <span class="k">left</span> <span class="k">asc</span> <span class="o">/</span><span class="k">desc</span> <span class="err">取从根节点</span><span class="o">/</span><span class="err">子节点开始</span> <span class="err">排序</span>
+
+</code></pre></div></div>
+<h3 id="laravel框架中的无限级分类-baumbaum-包">laravel框架中的无限级分类 baum/baum 包</h3>
+
+<p><code class="highlighter-rouge">
+  composer require baum/baum=1.1
+  #注册服务到 Baum/BaumServiceProvider到config/app.php
+</code>
+baum 分类的表结构 除了left和rgt外还有有depth深度</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">Schema</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="s1">'categories'</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nx">Blueprint</span> <span class="nv">$table</span><span class="p">)</span> <span class="p">{</span>
+         <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+         <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'parent_id'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">();</span>
+         <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'lft'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">();</span>
+         <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'rgt'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">index</span><span class="p">();</span>
+         <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">integer</span><span class="p">(</span><span class="s1">'depth'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">nullable</span><span class="p">();</span>
+         <span class="c1">// Add needed columns here (f.ex: name, slug, path, etc.)</span>
+         <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span>
+
+         <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">timestamps</span><span class="p">();</span>
+     <span class="p">});</span>
+</code></pre></div></div>
+<p>分类的model需要继承 Baum\Node,而Baum\Node是Model的子类封装了无限级分类的方法</p>
+
+<p>方法 | 名称
+—|—
+新增节点|save
+批量创建树|makeTree
+树状数组创建节点  |buildTree<br />
+获取祖先和自己  | getAncestorsAndSelf
+获取子孙和自己|getDescendantsAndSelf
+… 更多参见Node类</p>
+
+<h2 id="总结">总结</h2>
+
+<ol>
+  <li>无限级分类是一个常用的功能,可以封装成类,类似baum</li>
+  <li>根据业务需求,小规模,频繁改动,可以选中数组的无限级,大规模查询较多可以考虑数据库</li>
+  <li>数据结构非常重要,我去理解树的穿线完成无限级分类就用了很长时间</li>
+  <li>节点的移动是最大的难点</li>
+</ol>
+
+<p><a href="https://github.com/oldFuryBird/catetree">php实现无限级分类</a></p>
+<h2 id="参考文章">参考文章</h2>
+<p><a href="https://blog.csdn.net/joph_csu/article/details/54178359">穿线树实现无限级分类</a></p>
+
+<p><a href="https://segmentfault.com/a/1190000005142042">使用 Baum 嵌套集合模型来实现 Laravel 模型的无限级分类</a></p>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">我的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>我的博客</li>
+          <li><a href="mailto:ccwc3@163.com">ccwc3@163.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/oldFuryBird"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">oldFuryBird</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>php 野路子出身 终生学习 web开发 python
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
