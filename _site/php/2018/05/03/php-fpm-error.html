@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>[proxy_fcgi:error]问题排查</title>
+  <meta name="description" content="php-fpm 问题排查">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/php/2018/05/03/php-fpm-error.html">
+  <link rel="alternate" type="application/rss+xml" title="我的博客" href="http://localhost:4000/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">我的博客</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/archive/">归档</a>
+          
+        
+          
+          <a class="page-link" href="/tags/">标签</a>
+          
+        
+          
+          <a class="page-link" href="/about/">关于我</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">[proxy_fcgi:error]问题排查</h1>
+    <p class="post-meta"><time datetime="2018-05-03T11:10:58+08:00" itemprop="datePublished">May 3, 2018</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h1 id="php-fpm-问题排查">php-fpm 问题排查</h1>
+
+<h2 id="环境">环境</h2>
+<ol>
+  <li>web服务器 apache2.4 + php-fpm</li>
+  <li>php框架yii2</li>
+  <li>/etc/hosts 修改为</li>
+  <li>系统ubuntu17.10
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  127.0.0.1 backend.hyii2.com
+  127.0.0.1 fronted.hyii2.com
+</code></pre></div>    </div>
+  </li>
+  <li>apache2的vhosts 设置不同域名80端口的两个网站</li>
+</ol>
+
+<h2 id="故障">故障</h2>
+<p>在访问网站时,会偶然出现卡死的状态,浏览器不能返回结果,要么超时之后出现Gateway Timeout 50X错误,要么很久之后才返回结果</p>
+
+<h2 id="排查1">排查1</h2>
+<p>因为我这里使用的是本地域名,我怀疑解析的顺序出现故障
+`
+  ping backend.hyii2.com
+  64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.036 ms
+  //ping能够秒回
+`</p>
+
+<p>`
+ traceroute backend.hyii2.com</p>
+
+<p>traceroute to fronted.hyii2.com (127.0.0.1), 30 hops max, 60 byte packets
+ 1  localhost (127.0.0.1)  0.497 ms  0.446 ms  0.421 ms
+ `
+    结果:ping 和traceroute 返回的信息证明是直接使用本地hosts的域名</p>
+
+<h2 id="排查2">排查2</h2>
+<p>一般问题都可以从日志和错误日志中查找答案,相关有一下日志:</p>
+<ol>
+  <li>apache日志  access.log error.log</li>
+  <li>php-fpm php-fpm.log</li>
+  <li>yii2框架runtime日志</li>
+</ol>
+
+<p>由于已经开启debug网页上面没有因为程序报错,那么框架日志无法记录错误信息</p>
+
+<p>查找apache错误日志发现问题:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[proxy_fcgi:error][pid 29992] [client 127.0.0.1:38254] AH01067: Failed to read FastCGI header
+[proxy_fcgi:error][pid 29992] [pid 29984] (104)Connection reset by peer:xxx
+[proxy_fcgi:error] [pid 2575] (70007)The timeout specified has expired:
+</code></pre></div></div>
+<p>大概有3类问题,读取fastcgi头部失败,连接重置,连接超时.全部指向fcgi代理,因为这里的apache没有使用mod_php,使用php-fpm</p>
+
+<p>根据提示,查找php-fpm日志,获得如下信息:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[03-May-2018 10:57:16] WARNING: [pool www] server reached pm.max_children setting (5), consider raising it
+</code></pre></div></div>
+
+<p>php-fpm警告最大子进程数过小需要提高</p>
+
+<p>查看当前php-fpm状态</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl status php7.1-fpm
+● php7.1-fpm.service - The PHP 7.1 FastCGI Process Manager
+   Loaded: loaded (/lib/systemd/system/php7.1-fpm.service; enabled; vendor preset: enabled)
+   Active: active (running) since Thu 2018-05-03 10:56:45 CST; 56min ago
+     Docs: man:php-fpm7.1(8)
+ Main PID: 30269 (php-fpm7.1)
+   Status: "Processes active: 5, idle: 0, Requests: 262, slow: 0, Traffic: 0req/sec"
+    Tasks: 6 (limit: 4915)
+   CGroup: /system.slice/php7.1-fpm.service
+           ├─30269 php-fpm: master process (/etc/php/7.1/fpm/php-fpm.conf)
+           ├─30291 php-fpm: pool www
+           ├─30292 php-fpm: pool www
+           ├─30299 php-fpm: pool www
+           ├─30329 php-fpm: pool www
+           └─30358 php-fpm: pool www
+
+5月 03 10:56:44 wh-lenovo-g400 systemd[1]: Starting The PHP 7.1 FastCGI Process Manager...
+5月 03 10:56:45 wh-lenovo-g400 systemd[1]: Started The PHP 7.1 FastCGI Process Manager.
+
+</code></pre></div></div>
+<p>状态信息显示 5个进程激活,空闲0,已经处理请求262</p>
+
+<h2 id="思考">思考</h2>
+<p>开发环境需要的并发非常小,我只不过是手动点了记下,整体请求才不到300次,为什么会出现卡顿和进程不够用呢? 每个进程占用的资源不小,如果是进程的原因,那么在几千上万次请求时岂不是需要大量的资源?</p>
+
+<h2 id="调试">调试</h2>
+<p>我更改php-fpm.conf配置项</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pm.max_children=50 # 最大进程数 50
+pm.max_requests = 500 # 每个进程在重置之前要处理500次请求
+</code></pre></div></div>
+<p>重启php-fpm</p>
+
+<p>解决问题,但是php-fpm内存占用的问题</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pm.max_children=5
+pm.max_requests=500
+</code></pre></div></div>
+<p>还是失败</p>
+
+<h2 id="查看所有php进程的内存占用">查看所有php进程的内存占用</h2>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps  aux | grep php-fpm | grep -v grep | awk '{ sum+=$6 } END { printf ("%d%s\n",sum/NR/1024,"M")}'
+</code></pre></div></div>
+<p>我这里php-fpm每个进程是20M左右的内存,如果最大进程数设置为50,那么跑满的最大内存消耗将达到1G</p>
+
+<p>官方建议 最大进程数设定为 分配给web服务器的内存/最大进程的大小</p>
+
+<p>如我分给web 512内存,那么php进程ps查看最大为40M,那么max_children适合12</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pm.max_children = Total RAM dedicated to the web server / Max child process size
+</code></pre></div></div>
+<p>默认安装的php会加载很多非必要的扩展,实际应用需要关闭这些扩展来降低内存使用</p>
+
+<h2 id="为什么选择php-fpm">为什么选择php-fpm?</h2>
+<ol>
+  <li>webserver 是只能处理动态内容的,当遇到动态请求,就会在后台执行php脚本程序并fork一个进程去完成任务,并返回结果. 即CGI程序</li>
+  <li>CGI协议,定义了web server 与cgi程序之间的通信,把context如path_info,script_path,request等如php $_SERVER,$_REQUESTS等全局变量的内容就是来自web server. 类似apache mod_php,就是一套cgi协议的扩展,和apache一起启动,每次有动态请求就去fork一个cgi程序.</li>
+  <li>fast-cgi使得cgi和webserver通过socket通信,cgi需要一个进程来管理,php-fpm就是一个主进程管理其他进程池</li>
+  <li>mod_php 和apache一起启动,修改php.ini配置需要重启apache</li>
+  <li>性能差别,需要去测试验证</li>
+</ol>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">我的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>我的博客</li>
+          <li><a href="mailto:ccwc3@163.com">ccwc3@163.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/oldFuryBird"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">oldFuryBird</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>php 野路子出身 终生学习 web开发 python
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
