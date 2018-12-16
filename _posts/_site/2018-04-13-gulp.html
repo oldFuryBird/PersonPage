@@ -1,0 +1,10 @@
+<h2 id="使用gulp40坑">使用gulp4.0坑</h2>
+<ol>
+  <li>gulp-util is deprecated 弃用</li>
+  <li>gulp-cli需要使用4.0 gulp</li>
+  <li>task需要done()或文档的返回方式,否则
+    [16:20:22] The following tasks did not complete: default, webpack
+    [16:20:22] Did you forget to signal async completion?</li>
+  <li>task方法有变化,[task1,task2] 废弃,gulp.series(task1,task2,[callback],gulp.parallel(task1,task2,[callback]) 排队执行和异步(同时)执行</li>
+  <li>es6解构前面一定要有分号 ;</li>
+</ol>

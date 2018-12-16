@@ -1,0 +1,102 @@
+<h1 id="函数式编程笔记与思考">函数式编程(笔记与思考)</h1>
+
+<h2 id="函数式编程的优势">函数式编程的优势</h2>
+<ul>
+  <li>易于开发:代码简洁,大大降低开发成本.</li>
+  <li>易于分享,更接近自然语言,代码即文档.</li>
+  <li>性能更高,能够实现”concurrency”并发编程;<strong>函数式编程不会依赖,不会改变外界的状态,相同的输入总会获得相同的输出,不存在’锁’线程的问题</strong></li>
+  <li>部署简单,函数式编程没有副作用</li>
+</ul>
+
+<h2 id="函数式编程的基本原则-函数是一等公民">函数式编程的基本原则 (函数是一等公民)</h2>
+<ul>
+  <li>直接把函数赋给变量</li>
+  <li>使用最普适的变量命名</li>
+  <li>避免依赖外部外部变量</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+js中 array.concat(),array.slice() 等函数不会改变数据状态,而array.splice却会改变原来的数据
+</code></p>
+
+<ul>
+  <li>避免使用 this</li>
+</ul>
+
+<h2 id="函数化编程工具和方法">函数化编程工具和方法</h2>
+
+<h3 id="科理化curry动态产生新函数">科理化(curry):动态产生新函数</h3>
+<ul>
+  <li>定义,把接受多个参数的函数变成接受一个单一参数的(第一个)函数,然后返回接受剩余参数的新函数</li>
+</ul>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">var</span> <span class="nx">add</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">addTenTo</span> <span class="o">=</span> <span class="nx">add</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+    <span class="nx">addTenTo</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="c1">// lodash curry可以工具可以直接生成cury函数</span>
+<span class="c1">// 使用化例子</span>
+<span class="kd">var</span> <span class="nx">curry</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">curry</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">what</span><span class="p">,</span> <span class="nx">str</span><span class="p">){</span>
+    <span class="k">return</span> <span class="nx">str</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">what</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">\s</span><span class="sr">+/g</span><span class="p">,</span><span class="s1">'hello world'</span><span class="p">);</span>
+
+<span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">\s</span><span class="sr">+/g</span><span class="p">)(</span><span class="s1">'hello world'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">hasSpaces</span> <span class="o">=</span> <span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">\s</span><span class="sr">+/g</span><span class="p">);</span>
+
+<span class="nx">hasSpaces</span><span class="p">(</span><span class="s1">'hello world'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">filter</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">ary</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">ary</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">f</span><span class="p">);</span>
+<span class="p">})</span>
+
+<span class="kd">var</span> <span class="nx">findHasSpacesOf</span> <span class="o">=</span> <span class="nx">filter</span><span class="p">(</span><span class="nx">hasSpaces</span><span class="p">)</span>
+
+<span class="nx">findHasSpacesOf</span><span class="p">([</span><span class="s1">'tori_spelling'</span><span class="p">,</span><span class="s1">'tori amos'</span><span class="p">])</span>
+<span class="c1">// ['tori amos']</span>
+
+</code></pre></div></div>
+<h3 id="自由组合新函数-compose">自由组合新函数 compose</h3>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">var</span> <span class="nx">compose</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span><span class="nx">g</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">f</span><span class="p">(</span><span class="nx">g</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1">// f,g都是函数,x是他们之间通过管道传输的值,g先于f执行,数据流从左到右,可以任意拆分,及其灵活</span>
+   <span class="kd">var</span> <span class="nx">associative</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span><span class="nx">compose</span><span class="p">(</span><span class="nx">g</span><span class="p">,</span><span class="nx">h</span><span class="p">))</span> <span class="o">==</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">compose</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span><span class="nx">g</span><span class="p">),</span><span class="nx">h</span><span class="p">);</span><span class="c1">// true</span>
+   
+</code></pre></div></div>
+<p><strong>compose和curry非常灵活的组装新的函数,且没有依赖产生,大大减少参数和弱化参数</strong></p>
+
+<h3 id="注释签名函数的行为和目的">注释:签名函数的行为和目的</h3>
+<ul>
+  <li>解决阅读和使用的困难,Hindley-Milner类型系统</li>
+  <li>todo *****待完成</li>
+</ul>
+
+<h3 id="容器处理控制流异常异步和状态的独立模块">容器:处理控制流,异常,异步和状态的独立模块</h3>
+
+<h3 id="数据验证仿函数">数据验证仿函数</h3>
+
+<h3 id="错误处理仿函数">错误处理仿函数</h3>
+
+<h3 id="异步处理仿函数">异步处理仿函数</h3>
+
+<h3 id="套嵌处理仿函数">套嵌处理仿函数</h3>
+
+<h2 id="学习的优秀函数式编程库">学习的优秀函数式编程库</h2>
+<ul>
+  <li>lodash/FP</li>
+  <li>ramda.js</li>
+  <li>Folktale</li>
+</ul>
+
+<h4 id="读书记录-nodejs区块链开发-朱志文-isbn-978-7-111-56695-3感谢作者的总结与分享">读书记录 «Node.js区块链开发» 朱志文 ISBN 978-7-111-56695-3,感谢作者的总结与分享</h4>
+
